@@ -80,6 +80,7 @@ RefCountedKinematicTree ConstrainedTreeBuilder::buildTree(const std::vector<RefC
 	bMatrix * vtxTrackCov * ROOT::Math::Transpose(aMatrix)+
 	bMatrix * vertexCov * ROOT::Math::Transpose(bMatrix);
 
+    std::cerr << "ConstrainedTreeBuilder cov lower block = " << AlgebraicSymMatrix77(nCovariance.LowerBlock()) << '\n';
     KinematicState stateAtVertex(KinematicParameters(par),
 	KinematicParametersError(AlgebraicSymMatrix77(nCovariance.LowerBlock())),
 	iStates->particleCharge(), iStates->magneticField());
@@ -109,6 +110,7 @@ RefCountedKinematicTree ConstrainedTreeBuilder::buildTree(const std::vector<RefC
 
   AlgebraicMatrix77 cov = asSMatrix<7,7>(covarianceMatrix(rParticles,virtualPartPar,fullCov));
 
+    std::cerr << "ConstrainedTreeBuilder cov lower block = " << AlgebraicSymMatrix77(cov.LowerBlock()) << '\n';
   KinematicState nState(KinematicParameters(virtualPartPar),
 	KinematicParametersError(AlgebraicSymMatrix77(cov.LowerBlock())),
 	charge, initialParticles[0]->magneticField());

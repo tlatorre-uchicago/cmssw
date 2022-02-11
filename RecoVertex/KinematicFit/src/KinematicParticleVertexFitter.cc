@@ -56,6 +56,7 @@ edm::ParameterSet KinematicParticleVertexFitter::defaultParameters() const
  
 RefCountedKinematicTree KinematicParticleVertexFitter::fit(const std::vector<RefCountedKinematicParticle> &particles) const
 {
+    fprintf(stderr, "fit() called!\n");
  typedef ReferenceCountingPointer<VertexTrack<6> > RefCountedVertexTrack;
 //sorting the input 
  if(particles.size()<2) throw VertexException("KinematicParticleVertexFitter::input states are less than 2"); 
@@ -77,13 +78,22 @@ RefCountedKinematicTree KinematicParticleVertexFitter::fit(const std::vector<Ref
 //vector of Vertex Tracks to fit
  std::vector<RefCountedVertexTrack> ttf; 
  TrackKinematicStatePropagator propagator_;
+ int k = 0;
  for(auto const &  i : newPart){
+    std::cerr << "particle number " << k++ << " with charge = " << (i)->currentState().particleCharge() << '\n';
+    for (int j = 0; j < 7; j++) {
+        if ((i)->currentState().kinematicParametersError().matrix()(j,j) < 0) {
+            std::cerr << "error! got a negative cov matrix " << (i)->currentState().kinematicParametersError().matrix() << '\n';
+            exit(1);
+        }
+    }
    if( !(i)->currentState().isValid() || !propagator_.willPropagateToTheTransversePCA((i)->currentState(), linPoint) ) {
      // std::cout << "Here's the bad state." << std::endl;
      return ReferenceCountingPointer<KinematicTree>(new KinematicTree()); // return invalid vertex
    }
    ttf.push_back(vFactory->vertexTrack((i)->particleLinearizedTrackState(linPoint),state,1.));
  }
+ std::cerr << "done!\n";
 
 // //debugging code to check neutrals: 
 //  for(std::vector<RefCountedVertexTrack>::const_iterator i = ttf.begin(); i!=ttf.end(); i++)

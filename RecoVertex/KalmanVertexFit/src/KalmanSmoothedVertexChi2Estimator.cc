@@ -26,6 +26,18 @@ KalmanSmoothedVertexChi2Estimator<N>::estimate(const CachingVertex<N> & vertex) 
     sum += (*i)->weight() * result.second;
   }
  returnChi = v_part + sum;
+ if (returnChi < 0) {
+    fprintf(stderr, "v_part = %f\n", v_part);
+    fprintf(stderr, "sum = %f\n", sum);
+    fprintf(stderr, "KalmanSmoothedVertexChi2Estimator: returnChi < 0!\n");
+      for(typename std::vector<RefCountedVertexTrack>::iterator i = tracks.begin(); i != tracks.end(); i++)
+      {
+        BDpair result = helper.trackParameterChi2((*i)->linearizedTrack(), (*i)->refittedState());
+        success = success && result.first;
+        fprintf(stderr, "(*i)->weight = %f\n", (*i)->weight());
+        fprintf(stderr, "second = %f\n", result.second);
+      }
+ }
  return BDpair(success, returnChi);
 }
 

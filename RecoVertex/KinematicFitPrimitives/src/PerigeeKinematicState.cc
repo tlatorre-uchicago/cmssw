@@ -26,6 +26,9 @@ PerigeeKinematicState::PerigeeKinematicState(const KinematicState& state, const 
  AlgebraicMatrix67 jacobian = cu2pe*ki2cu;
 
  cov = ExtendedPerigeeTrajectoryError(ROOT::Math::Similarity(jacobian, err));
+ // err is not positive definite!
+ std::cerr << "extended perigee err = " << err << '\n';
+ std::cerr << "extended perigee cov = " << ROOT::Math::Similarity(jacobian, err) << '\n';
 
 }
 

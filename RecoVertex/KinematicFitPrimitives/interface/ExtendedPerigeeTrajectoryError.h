@@ -8,12 +8,17 @@ class ExtendedPerigeeTrajectoryError
 { 
 public:
  ExtendedPerigeeTrajectoryError(): weightAvailable(false),vl(false)
- {}
+ {
+    std::cerr << "called without weights!\n";
+}
 
  ExtendedPerigeeTrajectoryError(const AlgebraicSymMatrix66& covariance):
                                cov(covariance),weightAvailable(false),
 			       vl(true)
- {}
+ {
+
+    std::cerr << "called with weights!\n";
+}
 
 
 /**
@@ -34,10 +39,30 @@ public:
   error = 0;
   if(! weightIsAvailable()) {
     weight = cov.Inverse(error);
-   if(error != 0) LogDebug("RecoVertex/ExtendedPerigeeTrajectoryError") 
-       << "unable to invert covariance matrix\n";
+   if(error != 0) {
+        LogDebug("RecoVertex/ExtendedPerigeeTrajectoryError") << "unable to invert covariance matrix\n";
+        fprintf(stderr, "unable to invert covariance matrix!\n");
+    }
    weightAvailable = true;
   }
+    std::cerr << "cov = " << cov << '\n';
+    std::cerr << "weight = " << weight << '\n';
+    if (cov(1,1) < 0) {
+        std::cerr << "cov(1,1) < 0\n";
+        exit(1);
+    }
+    if (cov(2,2) < 0) {
+        std::cerr << "cov(2,2) < 0\n";
+        exit(1);
+    }
+    if (weight(1,1) < 0) {
+        std::cerr << "weight(1,1) < 0\n";
+        exit(1);
+    }
+    if (weight(2,2) < 0) {
+        std::cerr << "weight(2,2) < 0\n";
+        exit(1);
+    }
   return weight;
  }
  

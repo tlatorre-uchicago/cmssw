@@ -88,6 +88,19 @@ public:
     if (!tkToVertexCovarianceAvailable()) {
       throw VertexException("VertexTrack::track to vertex covariance not available"); 
     }
+    
+    if (fullCovariance_(1,1) < 0) {
+        std::cerr << "fullCovariance_(1,1) < 0!\n";
+        exit(1);
+    }
+    if (fullCovariance_(2,2) < 0) {
+        std::cerr << "fullCovariance_(2,2) < 0!\n";
+        exit(1);
+    }
+    if (fullCovariance_(3,3) < 0) {
+        std::cerr << "fullCovariance_(3,3) < 0!\n";
+        exit(1);
+    }
     return fullCovariance_;
   }
 

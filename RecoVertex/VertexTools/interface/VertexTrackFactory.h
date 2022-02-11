@@ -48,6 +48,7 @@ public:
 	      const RefCountedRefittedTrackState & refittedState,
 	      float smoothedChi2,
 	      const AlgebraicSymMatrixOO & tVCov, float weight = 1.0 ) const {
+    std::cerr << "returning a ref counted vertex track with = " << tVCov << '\n';
     return RefCountedVertexTrack(new VertexTrack<N>(lt, vs, weight,
                                  refittedState, smoothedChi2, tVCov));
   };

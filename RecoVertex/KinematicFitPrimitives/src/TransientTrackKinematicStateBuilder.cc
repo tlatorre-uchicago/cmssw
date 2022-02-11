@@ -22,6 +22,7 @@ KinematicState TransientTrackKinematicStateBuilder::operator()(const TransientTr
                           const GlobalPoint& point, const ParticleMass& m,float m_sigma) const
 {
 //  FreeTrajectoryState  recState = track.trajectoryStateClosestToPoint(point).theState();
+/* TransientTrack has *no* error, so it's introduced when doing the closest point thing I think. */
  return buildState( track.trajectoryStateClosestToPoint(point).theState(), m, m_sigma);
 } 
 
@@ -36,6 +37,8 @@ KinematicState TransientTrackKinematicStateBuilder::operator()(const FreeTraject
                         const ParticleMass& mass,float m_sigma, const GlobalPoint& point) const
 {
 //building initial kinematic state 
+ fprintf(stderr, "TransientTrackKinematicStateBuilder\n");
+ std::cerr << "state->cartesianError " << state.cartesianError().matrix() << '\n';
  KinematicState res = buildState(state,mass,m_sigma);
  
 //and propagating it to given point if needed
@@ -57,5 +60,6 @@ TransientTrackKinematicStateBuilder::buildState(const FreeTrajectoryState & stat
 	const ParticleMass& mass, float m_sigma) const
 { 
 
+ fprintf(stderr, "TransientTrackKinematicStateBuilder::buildState\n");
   return KinematicState(state,mass, m_sigma);
 }

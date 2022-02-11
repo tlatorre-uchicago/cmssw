@@ -191,7 +191,10 @@ KinematicConstrainedVertexFitterT< nTrk, nConstraint>::fit(const std::vector<Ref
 	return ReferenceCountingPointer<KinematicTree>(new KinematicTree());
       }
       inPar.Place_at(state.kinematicParameters().vector(),3+7*nSt);
+      std::cerr << "updating error matrix!\n" << '\n';
+      std::cerr << "before = " << state.kinematicParametersError().matrix() << '\n';
       inCov.Place_at(state.kinematicParametersError().matrix(),3 + 7*nSt,3 + 7*nSt);
+      std::cerr << "after = " << state.kinematicParametersError().matrix() << '\n';
       ++nSt;
     }
   

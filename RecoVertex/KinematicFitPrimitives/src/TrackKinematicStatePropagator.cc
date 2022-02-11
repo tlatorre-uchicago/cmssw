@@ -72,6 +72,7 @@ bool TrackKinematicStatePropagator::willPropagateToTheTransversePCA(const Kinema
 KinematicState
 TrackKinematicStatePropagator::propagateToTheTransversePCACharged
 (const KinematicState& state, const GlobalPoint& referencePoint) const {
+ std::cerr << "CHARGED!\n";
   //first use the existing FTS propagator to obtain parameters at PCA
   //in transverse plane to the given point
   
@@ -132,6 +133,8 @@ TrackKinematicStatePropagator::propagateToTheTransversePCACharged
     AlgebraicSymMatrix55 cov2 = ROOT::Math::Similarity(prop.jacobian(), fState.curvilinearError().matrix());
     FreeTrajectoryState fts(fPar,  CurvilinearTrajectoryError(cov2));
 
+    std::cerr << "thereIsNoCorr\n";
+    std::cerr << "err " << state.kinematicParametersError().matrix() << '\n';;
     return  KinematicState(fts, state.mass(), std::sqrt(state.kinematicParametersError().matrix()(6,6)));
 
     //KinematicState kRes(fts, state.mass(), std::sqrt(state.kinematicParametersError().matrix()(6,6)));
@@ -139,6 +142,7 @@ TrackKinematicStatePropagator::propagateToTheTransversePCACharged
     // std::cout << "curv from final K\n" << kRes.freeTrajectoryState().curvilinearError().matrix() << std::endl;
 
   } else {
+    std::cerr << "creating correlation matrix\n";
   
 
     JacobianCartesianToCurvilinear cart2curv(inPar);
@@ -155,6 +159,7 @@ TrackKinematicStatePropagator::propagateToTheTransversePCACharged
     //now both transformation jacobians: cartesian to curvilinear and back are done
     //We transform matrix to curv frame, then propagate it and translate it back to
     //cartesian frame.  
+    std::cerr << "Propagator error (charged) = " << state.kinematicParametersError().matrix() << '\n';
     AlgebraicSymMatrix66 cov1 = ROOT::Math::Similarity(ca2cu, state.kinematicParametersError().matrix());
     
     /*
@@ -182,6 +187,7 @@ TrackKinematicStatePropagator::propagateToTheTransversePCACharged
     
     //return parameters as a kiematic state  
     KinematicParameters resPar(par);
+  std::cerr << "Propagator resEr = " << cov << '\n';
   KinematicParametersError resEr(cov);
   
   return KinematicState(resPar,resEr,state.particleCharge(), state.magneticField());
@@ -198,6 +204,7 @@ TrackKinematicStatePropagator::propagateToTheTransversePCACharged
 KinematicState TrackKinematicStatePropagator::propagateToTheTransversePCANeutral
 	(const KinematicState& state, const GlobalPoint& referencePoint) const
 {
+ std::cerr << "NEUTRAL!\n";
 //new parameters vector and covariance:
  AlgebraicVector7 par;
  AlgebraicSymMatrix77 cov;
@@ -256,6 +263,7 @@ KinematicState TrackKinematicStatePropagator::propagateToTheTransversePCANeutral
   //now both transformation jacobians: cartesian to curvilinear and back are done
   //We transform matrix to curv frame, then propagate it and translate it back to
   //cartesian frame.  
+  std::cerr << "Propagator error (neutral) = " << state.kinematicParametersError().matrix() << '\n';
   AlgebraicSymMatrix66 cov1 = ROOT::Math::Similarity(ca2cu, state.kinematicParametersError().matrix());
   
   //propagation jacobian
@@ -265,7 +273,9 @@ KinematicState TrackKinematicStatePropagator::propagateToTheTransversePCANeutral
   pr.Place_at(prop.jacobian(),0,0);
   
   //transportation
+  std::cerr << "Propagator cov1 = " << cov1 << '\n';
   AlgebraicSymMatrix66 cov2 = ROOT::Math::Similarity(pr, cov1);
+  std::cerr << "Propagator cov2 = " << cov2 << '\n';
   
   //now geting back to 7-parametrization from curvilinear
   cov = ROOT::Math::Similarity(cu2ca, cov2);
@@ -274,6 +284,7 @@ KinematicState TrackKinematicStatePropagator::propagateToTheTransversePCANeutral
   
   //return parameters as a kiematic state  
   KinematicParameters resPar(par);
+  std::cerr << "Propagator resEr = " << cov << '\n';
   KinematicParametersError resEr(cov);
   return  KinematicState(resPar,resEr,state.particleCharge(), state.magneticField()); 
 

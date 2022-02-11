@@ -1,5 +1,6 @@
 #ifndef TrackReco_TransientTrack_h
 #define TrackReco_TransientTrack_h
+#include "signal.h"
 
 
   /**
@@ -86,7 +87,7 @@ namespace reco {
 
     TrajectoryStateClosestToPoint 
       trajectoryStateClosestToPoint( const GlobalPoint & point ) const
-	{return data().trajectoryStateClosestToPoint(point);}
+	{raise(SIGINT);return data().trajectoryStateClosestToPoint(point);}
 
     TrajectoryStateOnSurface stateOnSurface(const GlobalPoint & point) const
 	{return data().stateOnSurface(point);}

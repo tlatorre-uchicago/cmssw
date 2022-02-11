@@ -8,7 +8,11 @@ KinematicState::KinematicState(const KinematicParameters& parameters,
 			       const MagneticField* field) : 
   fts(GlobalTrajectoryParameters(parameters.position(),parameters.momentum(),charge,field), 
       CartesianTrajectoryError(error.matrix().Sub<AlgebraicSymMatrix66>(0,0))),
-  param(parameters),err(error),  vl(true){}
+  param(parameters),err(error),  vl(true){
+
+  std::cerr << "KinematicState constructor error " << error.matrix() << '\n';
+
+}
 
 
 bool KinematicState::operator==(const KinematicState& other) const

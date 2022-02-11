@@ -27,7 +27,10 @@ VertexTrack<N>::VertexTrack(RefCountedLinearizedTrackState lt,
   : theLinTrack(std::move(lt)), theVertexState(std::move(v)), theWeight(weight),
     stAvailable(true), covAvailable(true), 
     theRefittedState(refittedState), fullCovariance_(fullCov),
-    smoothedChi2_(smoothedChi2) {}
+    smoothedChi2_(smoothedChi2) {
+    std::cerr << "fullCovariance_ = " << fullCov << '\n';
+
+}
 
 
 template <unsigned int N>

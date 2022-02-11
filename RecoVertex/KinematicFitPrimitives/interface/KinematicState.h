@@ -37,13 +37,25 @@ public:
 		 const KinematicParametersError& error, const TrackCharge& charge,
   		 const MagneticField* field);
   
+  //KinematicState(const FreeTrajectoryState & state, 
+  //      	 const ParticleMass& mass, float m_sigma) :
+  //  fts(state), 
+  //  param(state.position().x(),state.position().y(),state.position().z(),
+  //        state.momentum().x(),state.momentum().y(),state.momentum().z(),
+  //        mass),
+  //  err(state.cartesianError(),m_sigma), vl(true){
   KinematicState(const FreeTrajectoryState & state, 
-		 const ParticleMass& mass, float m_sigma) :
-    fts(state), 
-    param(state.position().x(),state.position().y(),state.position().z(),
-	  state.momentum().x(),state.momentum().y(),state.momentum().z(),
-	  mass),
-    err(state.cartesianError(),m_sigma), vl(true){}
+		 const ParticleMass& mass, float m_sigma) {
+    fts = FreeTrajectoryState(state);
+    param = KinematicParameters(state.position().x(),state.position().y(),state.position().z(),
+          state.momentum().x(),state.momentum().y(),state.momentum().z(),
+          mass);
+    std::cerr << "state.cartesianError() " << state.cartesianError().matrix() << '\n';
+    err = KinematicParametersError(state.cartesianError(),m_sigma);
+    vl = true;
+
+
+}
   
   
  bool operator==(const KinematicState& other) const;

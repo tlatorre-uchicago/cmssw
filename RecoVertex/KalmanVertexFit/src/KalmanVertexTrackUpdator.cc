@@ -24,6 +24,7 @@ KalmanVertexTrackUpdator<N>::update
   std::pair<bool, double> result = helper.trackParameterChi2(track->linearizedTrack(), thePair.first);
   float smoothedChi2 = helper.vertexChi2(rVert, vertex.vertexState()) + result.second;
 
+  std::cerr << "KalmanVertexTrackUpdator cov " << thePair.second << '\n';
   return theVTFactory.vertexTrack(track->linearizedTrack(),
   	vertex.vertexState(), thePair.first, smoothedChi2, thePair.second,
 	track->weight());
@@ -47,6 +48,8 @@ KalmanVertexTrackUpdator<N>::trackRefit(const VertexState & vertex,
   typedef ROOT::Math::SMatrix<double,N+1,N+1,ROOT::Math::MatRepStd<double,N+1,N+1> > AlgebraicMatrixOO;
   typedef ROOT::Math::SMatrix<double,N-2,N-2,ROOT::Math::MatRepSym<double,N-2> > AlgebraicSymMatrixMM;
 
+  std::cerr << "N " << N << '\n';
+
   //Vertex position 
   GlobalPoint vertexPosition = vertex.position();
 
@@ -68,20 +71,35 @@ KalmanVertexTrackUpdator<N>::trackRefit(const VertexState & vertex,
   	linTrackState->predictedStateWeight(ifail);
 
   AlgebraicSymMatrixMM s = ROOT::Math::SimilarityT(b,trackParametersWeight);
+  // s is not positive definite!!!
+  std::cerr << "pos def matrix s " << s << '\n';
+  std::cerr << "weight " << weight << '\n';
   
   if (!invertPosDefMatrix(s)) 
       throw VertexException
   	("KalmanVertexTrackUpdator::S matrix inversion failed");
    
   //                                    NN           NM  MM
-  AlgebraicMatrixNM twbs =  trackParametersWeight *  b * s;
+  AlgebraicMatrixNM twbs =  trackParametersWeight *  (b * s);
+  std::cerr << "inverted matrix s " << s << '\n';
+  std::cerr << "b " << b << '\n';
 
 
+  std::cerr << "a " << a << '\n';
+  std::cerr << "vertexCoord " << vertexCoord << '\n';
+  std::cerr << "a*vertexCoord " << a*vertexCoord << '\n';
+  std::cerr << "linTrackState->predictedStateParameters() " << linTrackState->predictedStateParameters() << '\n';
+  std::cerr << "linTrackState->constantTerm() " << linTrackState->constantTerm() << '\n';
   AlgebraicVectorN vv = 
     linTrackState->predictedStateParameters() - linTrackState->constantTerm() - a*vertexCoord;
+  std::cerr << " vv " << vv << '\n';
   //                                   MM                MN                    NN
   //  AlgebraicVectorM newTrackMomentumP =  s * (ROOT::Math::Transpose(b)) * trackParametersWeight * vv;
+  std::cerr << "track parameters weight " << trackParametersWeight << '\n';
+  std::cerr << "old method " << (s * ((ROOT::Math::Transpose(b)) * trackParametersWeight)) * vv << '\n';
+  //std::cerr << "ROOT::Math::Transpose(twbs) " << ROOT::Math::Transpose(twbs) << '\n';
   AlgebraicVectorM newTrackMomentumP = ROOT::Math::Transpose(twbs) * vv;
+  std::cerr << "new method " << newTrackMomentumP << '\n';
 
    //AlgebraicMatrix3M refittedPositionMomentumConvariance = 
   //        33                        3N                    NN                  NM  MM
@@ -90,8 +108,13 @@ KalmanVertexTrackUpdator<N>::trackRefit(const VertexState & vertex,
   AlgebraicMatrix3N tmpM1 = -vertexErrorMatrix * (ROOT::Math::Transpose(a));
   AlgebraicMatrix3M  refittedPositionMomentumConvariance  = tmpM1 * twbs;
 
+  // Should this use the original s?
   AlgebraicSymMatrixMM refittedMomentumConvariance = s/weight +  
      ROOT::Math::SimilarityT(refittedPositionMomentumConvariance, vertex.weight().matrix());
+  std::cerr << "s/weight " << s/weight << '\n';
+  std::cerr << "refittedPositionMomentumConvariance " << refittedPositionMomentumConvariance << '\n';
+  std::cerr << "vertex.weight().matrix() " << vertex.weight().matrix() << '\n';
+  std::cerr << "ROOT::Math::SimilarityT(refittedPositionMomentumConvariance, vertex.weight().matrix()) " << ROOT::Math::SimilarityT(refittedPositionMomentumConvariance, vertex.weight().matrix()) << '\n';
 
   
  // int matrixSize = 3+3; //refittedMomentumConvariance.num_col();
@@ -100,12 +123,14 @@ KalmanVertexTrackUpdator<N>::trackRefit(const VertexState & vertex,
   covMatrix.Place_at(ROOT::Math::Transpose(refittedPositionMomentumConvariance), 3, 0);
   covMatrix.Place_at(vertexErrorMatrix, 0, 0);
   covMatrix.Place_at(refittedMomentumConvariance, 3 ,3);
+  std::cerr << "refittedMomentumCovariance " << refittedMomentumConvariance << '\n';
 
   AlgebraicSymMatrixOO covSymMatrix(covMatrix.LowerBlock());
 
   RefCountedRefittedTrackState refittedTrackState = linTrackState->
 	createRefittedTrackState(vertexPosition, newTrackMomentumP, covSymMatrix);
 
+  std::cerr << "covSymMatrix " << covSymMatrix << '\n';
   return trackMatrixPair(refittedTrackState, covSymMatrix);
 //   		(refittedTrackState, refittedPositionMomentumConvariance);
 } 

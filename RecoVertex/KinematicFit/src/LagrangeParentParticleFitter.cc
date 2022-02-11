@@ -250,6 +250,7 @@ std::vector<RefCountedKinematicTree>  LagrangeParentParticleFitter::fit(const st
   
 //new refitted parameters and covariance  
   KinematicParameters param(lRefPar);
+  std::cerr << "Lagrange particle filter lRefCovS = " << lRefCovS << '\n';
   KinematicParametersError er(lRefCovS); 
   KinematicState kState(param,er,(*i)->initialState().particleCharge(), (**i).magneticField());
   RefCountedKinematicParticle refParticle  = (*i)->refittedParticle(kState,chi(j),ndf(j),cs->clone());

@@ -80,6 +80,8 @@ bool  ParticleKinematicLinearizedTrackState::hasError() const
 // (6x3) and (6x4) respectivelly.
 void  ParticleKinematicLinearizedTrackState::computeJacobians() const
 {
+ std::cerr << "computeJacobians called!\n";
+ std::cerr << "part->CurrentState()!\n";
  GlobalPoint paramPt(theLinPoint);
  thePredState = builder(part->currentState(), paramPt); 
 //  bool valid = thePredState.isValid();

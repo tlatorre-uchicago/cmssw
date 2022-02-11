@@ -84,6 +84,7 @@ RefCountedKinematicTree FinalTreeBuilder::buildTree(const CachingVertex<6>& vtx,
 
 //new born kinematic particle
  KinematicParameters kPar(par);
+ std::cerr << "FinalTreeBuilder sCov = " << sCov << '\n';
  KinematicParametersError kEr(sCov);
  const MagneticField* field=input.front()->magneticField();
  KinematicState nState(kPar, kEr, ch, field);
@@ -114,6 +115,7 @@ RefCountedKinematicTree FinalTreeBuilder::buildTree(const CachingVertex<6>& vtx,
   AlgebraicVector7 lPar = rS->kinematicParameters();
   KinematicParameters lkPar(lPar);
   AlgebraicSymMatrix77 lCov = rS->kinematicParametersCovariance();
+ std::cerr << "FinalTreeBuilder lCov = " << lCov << '\n';
   KinematicParametersError lkCov(lCov);
   TrackCharge lch = lT->charge();
   KinematicState nState(lkPar,lkCov,lch, field);
@@ -206,22 +208,29 @@ AlgebraicMatrix FinalTreeBuilder::momentumPart(const CachingVertex<6>& vtx,
 //4-momentum corellatons: diagonal elements of the matrix
    AlgebraicMatrix fullCovMatrix(asHepMatrix<7>((**rt_i).fullCovariance()));
    AlgebraicMatrix m_m_cov = fullCovMatrix.sub(4,7,4,7);
+  std::cerr << "m_m_cov " << m_m_cov << '\n';
    AlgebraicMatrix x_p_cov = fullCovMatrix.sub(1,3,4,7);
+  std::cerr << "x_p_cov " << x_p_cov << '\n';
    AlgebraicMatrix p_x_cov = fullCovMatrix.sub(4,7,1,3);
+  std::cerr << "p_x_cov " << p_x_cov << '\n';
 
 // cout << "Full covariance: \n"<< (**rt_i).fullCovariance()<<endl;
 // cout << "Full m_m_cov: "<< m_m_cov<<endl;
 //  cout<<"p_x_cov"<< p_x_cov<<endl;
 //  cout<<"x_p_cov"<< x_p_cov<<endl;
 
+  std::cerr << "cov before momentum momentum" << cov << '\n';
 //putting everything to the joint covariance matrix:
 //diagonal momentum-momentum elements:
+   // negative diagonal introduced here
    cov.sub(i_int*4 + 4, i_int*4 + 4,m_m_cov);
 
+  std::cerr << "cov before position momentum" << cov << '\n';
 //position momentum elements:
    cov.sub(1,i_int*4 + 4,x_p_cov);
    cov.sub(i_int*4 + 4,1,p_x_cov);
 
+  std::cerr << "cov before off diagonal" << cov << '\n';
 //off diagonal elements: corellations
 // track momentum - track momentum
   }
@@ -241,7 +250,8 @@ AlgebraicMatrix FinalTreeBuilder::momentumPart(const CachingVertex<6>& vtx,
  }
 // cout<<"jac"<<jac<<endl;
 // cout<<"cov"<<cov<<endl;
-//  cout << "final result new"<<jac*cov*jac.T()<<endl;
+  std::cerr << "final result cov" << cov << '\n';
+  std::cerr << "final result new" << jac*cov*jac.T() << '\n';
 
  return jac*cov*jac.T();
 }

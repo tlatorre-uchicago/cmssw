@@ -72,6 +72,7 @@ int main() {
 
   auto c = ks.kinematicParametersError().matrix();
   c(0,6) = -0.0001;
+  std::cerr << "KinematicState kpe = " << c << '\n';
   KinematicParametersError kpe(c);
   KinematicState ks2( ks.kinematicParameters(),kpe,ks.particleCharge(),ks.magneticField());
 

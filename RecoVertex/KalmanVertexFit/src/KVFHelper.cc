@@ -56,6 +56,26 @@ typename KVFHelper<N>::BDpair KVFHelper<N>::trackParameterChi2(
   linTrack->checkParameters(parameterResiduals);
   int error;
   float lChi2 = ROOT::Math::Similarity(parameterResiduals, linTrack->predictedStateWeight(error));
+    if (lChi2 < 0) {
+        fprintf(stderr, "lChi2 = %f!\n", lChi2);
+        fprintf(stderr, "error = %i!\n", error);
+        fprintf(stderr, "parameterResiduals = %.17f %.17f %.17f %.17f %.17f %.17f!\n", parameterResiduals[0],
+                                                                     parameterResiduals[1],
+                                                                     parameterResiduals[2],
+                                                                     parameterResiduals[3],
+                                                                     parameterResiduals[4],
+                                                                     parameterResiduals[5]);
+        std::streamsize ss = std::cerr.precision();
+        std::cerr << std::setprecision(17) << linTrack->predictedStateWeight(error) << '\n';
+        std::cerr << std::setprecision(ss) << linTrack->predictedStateWeight(error) << '\n';
+    }
+        fprintf(stderr, "parameterResiduals = %f %f %f %f %f %f!\n", parameterResiduals[0],
+                                                                     parameterResiduals[1],
+                                                                     parameterResiduals[2],
+                                                                     parameterResiduals[3],
+                                                                     parameterResiduals[4],
+                                                                     parameterResiduals[5]);
+        std::cerr << linTrack->predictedStateWeight(error) << '\n';
   if (error != 0) return BDpair(false, -1.);
   return BDpair(true, lChi2);
 }

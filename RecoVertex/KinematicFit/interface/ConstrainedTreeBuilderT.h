@@ -137,6 +137,7 @@ ConstrainedTreeBuilderT::buildTree(const std::vector<RefCountedKinematicParticle
     nCovariance+=tmp;
     */
 
+    std::cerr << "Constrained nCovariance = " << nCovariance << '\n';
     KinematicState stateAtVertex(KinematicParameters(par),
 				 KinematicParametersError(nCovariance),
 				 iStates->particleCharge(), iStates->magneticField());
@@ -166,6 +167,7 @@ ConstrainedTreeBuilderT::buildTree(const std::vector<RefCountedKinematicParticle
 
   AlgebraicSymMatrix77 cov = this->covarianceMatrix<nTrk>(rParticles,virtualPartPar,fullCov);
 
+    std::cerr << "Constrained cov = " << cov << '\n';
   KinematicState nState(KinematicParameters(virtualPartPar),
 			KinematicParametersError(cov),
 			charge, initialParticles[0]->magneticField());

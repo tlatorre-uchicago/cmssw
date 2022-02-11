@@ -170,6 +170,7 @@ KinematicConstrainedVertexUpdator::update(const AlgebraicVector& inPar,
    AlgebraicSymMatrix nCovariance = r_cov_sym.sub(4 + i_int*7, 10 + i_int*7);
    TrackCharge chl = i_st->particleCharge();
    KinematicParameters nrPar(newPar);
+   std::cerr << "ConstrainedVertexUpdater nrEr = " << asSMatrix<7>(nCovariance) << '\n';
    KinematicParametersError nrEr(asSMatrix<7>(nCovariance));
    KinematicState newState(nrPar,nrEr,chl, field);
    ns.push_back(newState);

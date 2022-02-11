@@ -185,6 +185,7 @@ KinematicConstrainedVertexUpdatorT< nTrk, nConstraint >::update(const ROOT::Math
    nCovariance = inCov.template Sub<ROOT::Math::SMatrix<double, 7,7,ROOT::Math::MatRepSym<double,7> > >(3 + i_int*7, 3 + i_int*7);
    TrackCharge chl = i_st->particleCharge();
    KinematicParameters nrPar(newPar);
+    std::cerr << "vertex updator nCovariance = " << nCovariance << '\n';
    KinematicParametersError nrEr(nCovariance);
    KinematicState newState(nrPar,nrEr,chl, field);
    (*i_st) = newState;

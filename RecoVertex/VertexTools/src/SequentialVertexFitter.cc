@@ -243,6 +243,7 @@ SequentialVertexFitter<N>::reLinearizeTracks(
     //    RefCountedLinearizedTrackState lTrData = 
     //      theLTrackFactory->linearizedTrackState(linP, 
     // 				    (**i).linearizedTrack()->track());
+    std::cerr << "creating a new vertex track with weight " << (**i).weight() << '\n';
     RefCountedVertexTrack vTrData =
       theVTrackFactory.vertexTrack(lTrData,state, (**i).weight() );
     finalTracks.push_back(vTrData);

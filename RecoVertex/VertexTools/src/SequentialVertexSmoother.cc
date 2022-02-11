@@ -64,6 +64,7 @@ SequentialVertexSmoother<N>::smooth(const CachingVertex<N> & vertex) const
   // Smoothed chi2
 
   float smChi2 = vertex.totalChiSquared();
+  float initialChi2 = smChi2;
   if (theVertexSmoothedChiSquaredEstimator != nullptr) {
     std::pair<bool, double> result = theVertexSmoothedChiSquaredEstimator->estimate(interVertex);
     smChi2 = result.second;
@@ -88,6 +89,12 @@ SequentialVertexSmoother<N>::smooth(const CachingVertex<N> & vertex) const
     		newTracks, smChi2, tkMap);
     return finalVertex;
   }
+
+    if (smChi2 < 0) {
+        fprintf(stderr, "smChi2 < 0!\n");
+        fprintf(stderr, "smChi2 = %f!\n", smChi2);
+        fprintf(stderr, "initial chi2 = %f!\n", initialChi2);
+    }
 
   CachingVertex<N> finalVertex(vertex.vertexState(), newTracks, smChi2, tkMap);
   return finalVertex;
