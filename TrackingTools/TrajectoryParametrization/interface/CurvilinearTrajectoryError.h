@@ -147,9 +147,9 @@ int modchol_ldlt(TMatrixD A, double delta)
     TMatrixD DMC = eye(N);
 
     // Modified Cholesky perturbations.
-    k = 1;
-    while (k <= N) {
-        if ((k == N) || D(k,k+1) == 0) { // 1-by-1 block
+    k = 0;
+    while (k < N) {
+        if ((k == N-1) || D(k,k+1) == 0) { // 1-by-1 block
             if (D(k,k) <= delta)
                 DMC(k,k) = delta;
             else
@@ -160,7 +160,7 @@ int modchol_ldlt(TMatrixD A, double delta)
             TMatrixD E = D.GetSub(k,k+1,k,k+1);
             TMatrixD U(2,2);
             TMatrixD T = eig(E,U);
-            for (ii = 1; ii <= 2; ii++) {
+            for (ii = 0; ii < 2; ii++) {
                 if (T(ii,ii) <= delta)
                     T(ii,ii) = delta;
             }
