@@ -4,4 +4,7 @@
 <use   name="boost"/>
 <use   name="rootmath"/>
 <use   name="FWCore/Utilities"/>
+<use   name="root"/>
+<use   name="rootminuit"/>
+
 
