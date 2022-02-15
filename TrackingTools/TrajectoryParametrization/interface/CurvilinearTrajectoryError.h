@@ -42,6 +42,7 @@ int ldl(TMatrixD &V, TMatrixD &D)
         }
     }
     //this->_L = root(L, D);
+    return 0;
 }
 
 
@@ -54,7 +55,7 @@ TMatrixD root(TMatrixD& L, TMatrixD &D)
 
     // fortunately, the square root of a diagonal matrix is the square 
     // root of all its elements
-    TMatrix sqrt_D = D;
+    TMatrixD sqrt_D = D;
     for (i = 0; i < D.GetNrows(); i++) {
         sqrt_D(i,i) = sqrt(D(i,i));
     }
@@ -98,12 +99,13 @@ TMatrixD eye(int N)
     return D;
 }
 
-TMatrixD eig(TMatrixD &V, , TVectorD &e)
+TMatrixD eig(TMatrixD &V, TMatrixD &U)
 {
     int i;
     TMatrixD D = eye(V.GetNrows());
+    TVectorD e(V.GetNrows());
 
-    V.EigenVectors(e);
+    U = V.EigenVectors(e);
     for (i = 0; i < V.GetNrows(); i++)
         D(i,i) = e(i);
 
@@ -130,7 +132,7 @@ TMatrixD eig(TMatrixD &V, , TVectorD &e)
  * Authors: Bobby Cheng and Nick Higham, 1996; revised 2015. */
 int modchol_ldlt(TMatrixD A, double delta)
 {
-    int i, j, k, N;
+    int i, j, k, ii, N;
 
     if (!isHermitian(A)) {
         fprintf(stderr, "Must supply symmetric matrix.");
@@ -139,8 +141,7 @@ int modchol_ldlt(TMatrixD A, double delta)
 
     N = A.GetNrows();
 
-    TMatrix D(N,N);
-    TVectorD U(N);
+    TMatrixD D(N,N);
 
     ldl(A,D); 
     TMatrixD DMC = eye(N);
@@ -155,18 +156,24 @@ int modchol_ldlt(TMatrixD A, double delta)
                 DMC(k,k) = D(k,k);
             k = k+1;
         } else { // 2-by-2 block
-            E = D(k:k+1,k:k+1);
-            TMatrixDSub E = TMatrixDSub(D,k,k+1,k,k+1);
-            T = eig(E,U);
+            //E = D(k:k+1,k:k+1);
+            TMatrixD E = D.GetSub(k,k+1,k,k+1);
+            TMatrixD U(2,2);
+            TMatrixD T = eig(E,U);
             for (ii = 1; ii <= 2; ii++) {
-                if T(ii,ii) <= delta
+                if (T(ii,ii) <= delta)
                     T(ii,ii) = delta;
             }
+            TMatrixD temp = U*T*U.T();
+            //DMC(k:k+1,k:k+1) = (temp + temp.Transpose())/2;  // Ensure symmetric.
+            for (i = k; i <= k+1; i++)
+                for (j = k; j <= k+1; j++)
+                    DMC(i,j) = (temp(i,j) + temp(j,i))/2;  // Ensure symmetric.
+            k = k + 2;
         }
-        temp = U*(T*U).Transpose();
-        DMC(k:k+1,k:k+1) = (temp + temp.Transpose())/2;  // Ensure symmetric.
-        k = k + 2;
     }
+
+    return 0;
 }
 
 /** Parametrization of the error matrix in the curvilinear frame.
